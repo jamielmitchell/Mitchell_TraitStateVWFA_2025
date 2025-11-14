@@ -1,0 +1,150 @@
+---
+title: "Activation LMEs"
+output: html_notebook
+---
+
+Set Up
+```{r}
+# import packages
+library('glue')
+library('lme4')
+library('tidyverse')
+library('lmerTest')
+```
+
+```{r}
+# flag to save and print tables
+save_tables = FALSE
+print_tables = FALSE
+
+# set directories
+setwd("..")
+base_dir = getwd()
+data_dir = glue('{base_dir}/Source_Data/')
+tbl_dir = glue('{base_dir}/tables/')
+```
+
+Table S4
+```{r}
+# load the data
+all_data = read_csv(glue('{data_dir}tbl_s4.csv'), show_col_types = FALSE)
+
+# set reference categories and variable order
+all_data$dys_group <- factor(all_data$dys_group,levels=c('dyslexic','typical'))
+all_data$category <- factor(all_data$category,levels=c('T','FF','O','F','L'))
+ROIs = c('VWFA1','VWFA2','FFA1','FFA2')
+
+# loop through ROIs
+for (ROI in ROIs){
+  
+  # subset the data
+  roi_data = subset(all_data, roi==ROI)
+  
+  # define the formula
+  my_formula = as.formula('mean_psc ~ category*dys_group + age + mean_fd + good_run + (1 | sub)')
+  
+  # fit the model
+  lme_model=lmer(formula = my_formula, data = roi_data)
+  
+  # compile results
+  stat_summary = lme_model%>% summary()
+  
+  # save results
+  if (save_tables) {
+    write.table(stat_summary$coefficients,glue('{tbl_dir}tbl_s4_{ROI}.txt'), 
+                row.names = TRUE, sep = "\t")
+  }
+  
+  # print results
+  if (print_tables){
+    print(ROI)
+    print(stat_summary)
+  }
+  
+  }
+```
+
+Table S11
+```{r}
+# load the data
+all_data = read_csv(glue('{data_dir}tbl_s11.csv'), show_col_types = FALSE)
+
+# set reference categories and variable order
+all_data$study_group <- factor(all_data$study_group,levels=c('intervention','dys_control','typ_control'))
+all_data$category <- factor(all_data$category,levels=c('T','noText'))
+ROIs = c('VWFA1','VWFA2','FFA1','FFA2')
+
+# loop through ROIs
+for (ROI in ROIs){
+  
+  # subset the data
+  roi_data = subset(all_data, roi==ROI)
+  
+  # define the formula
+  my_formula = as.formula('mean_psc ~ MRI_days_ses2*category*study_group + age + mean_fd + good_run + (1 | sub)')
+  
+  # fit the model
+  lme_model=lmer(formula = my_formula, data = roi_data)
+  
+  # compile results
+  stat_summary = lme_model%>% summary()
+  
+  # save results
+  if (save_tables) {
+    write.table(stat_summary$coefficients,glue('{tbl_dir}tbl_s11_{ROI}.txt'), 
+                row.names = TRUE, sep = "\t")
+  }
+  
+  # print results
+  if (print_tables){
+    print(ROI)
+    print(stat_summary)
+  } 
+  }
+```
+
+
+Table S16
+```{r}
+# load the data
+all_data = read_csv(glue('{data_dir}tbl_s16.csv'), show_col_types = FALSE)
+
+# set reference categories and variable order
+all_data$study_group <- factor(all_data$study_group,levels=c('intervention','dys_control','typ_control'))
+all_data$category <- factor(all_data$category,levels=c('T','noText'))
+ROIs = c('VWFA1','VWFA2','FFA1','FFA2')
+assessments = c('wj_brs','wj_rf','twre_index','wj_mff_ss')
+
+# loop through ROIs and assessments
+for (ROI in ROIs){
+  # subset the data
+  roi_data = subset(all_data, roi==ROI)
+  
+  for (assessment in assessments){
+    
+    # define the formula
+my_formula = as.formula(paste0('mean_psc ~ ',assessment,'_trait + ',assessment,'_state*study_group + age + mean_fd + good_run + (1 | sub)'))    
+    
+# fit the model
+    lme_model=lmer(formula = my_formula, data = roi_data)
+    
+    # compile results
+    stat_summary = lme_model%>% summary()
+    
+     # save results
+    if (save_tables) {
+      write.table(stat_summary$coefficients,glue('{tbl_dir}tbl_s16_{ROI}_{assessment}.txt'), 
+                  row.names = TRUE, sep = "\t")
+    }
+    
+    # print results
+    if (print_tables){
+      print(ROI)
+      print(assessment)
+      print(stat_summary)
+    }
+  }
+}
+```
+
+

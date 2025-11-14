@@ -1,0 +1,206 @@
+---
+title: "ROI Scores LMEs"
+output: html_notebook
+---
+
+Set Up
+```{r}
+# import packages
+library('glue')
+library('lme4')
+library('tidyverse')
+library('lmerTest')
+```
+
+```{r}
+# flag to save and print tables
+save_tables = FALSE
+print_tables = FALSE
+
+# set directories
+setwd("..")
+base_dir = getwd()
+data_dir = glue('{base_dir}/Source_Data/')
+tbl_dir = glue('{base_dir}/tables/')
+```
+
+Table 1
+```{r}
+#load the data
+size_df = read_csv(glue('{data_dir}tbl_1.csv'),show_col_types = FALSE)
+
+#set reference
+size_df$study_group <- factor(size_df$study_group,levels=c('intervention','dys_control','typ_control'))
+
+# define variables for looping
+rois=c('VWFA1','VWFA2')
+assessments = c('wj_brs','wj_rf','twre_index','wj_mff_ss')
+
+# loop through hemis, assessments, and rois
+
+for (assessment in assessments){
+  for (ROI in rois){
+    
+    # subset the data
+    data=subset(size_df, roi==ROI)
+    
+    # define the formula
+    my_formula = as.formula(paste0('log_size ~ ',assessment,'_trait + ',assessment,'_state*study_group + age + mean_fd + good_run + (1 | sub)'))
+    
+    # fit the model
+    lme_model_covs=lmer(formula = my_formula, data = data)
+    
+    # compile results
+    stat_summary = lme_model_covs%>% summary()
+    
+    # save results
+    if (save_tables) {
+      write.table(stat_summary$coefficients,glue('{tbl_dir}tbl_1_{ROI}_{assessment}.txt'), 
+                  row.names = TRUE, sep = "\t")
+    }
+    
+    # print results
+    if (print_tables){
+      print(ROI)
+      print(assessment)
+      print(stat_summary)
+    }
+  }
+}
+
+```
+
+Table 2
+```{r}
+#load the data
+size_df = read_csv(glue('{data_dir}tbl_2.csv'),show_col_types = FALSE)
+
+#set reference
+size_df$study_group <- factor(size_df$study_group,levels=c('intervention','dys_control','typ_control'))
+
+# define variables for looping
+rois=c('FFA1','FFA2')
+assessments = c('wj_brs','wj_rf','twre_index','wj_mff_ss')
+
+# loop through assessments and rois
+
+for (assessment in assessments){
+  for (ROI in rois){
+    
+    # subset the data
+    data=subset(size_df, roi==ROI)
+    
+    # define the formula
+    my_formula = as.formula(paste0('log_size ~ ',assessment,'_trait + ',assessment,'_state*study_group + age + mean_fd + good_run + (1 | sub)'))
+    
+    # fit the model
+    lme_model_covs=lmer(formula = my_formula, data = data)
+    
+    # compile results
+    stat_summary = lme_model_covs%>% summary()
+    
+    # save results
+    if (save_tables) {
+      write.table(stat_summary$coefficients,glue('{tbl_dir}tbl_2_{ROI}_{assessment}.txt'), 
+                  row.names = TRUE, sep = "\t")
+    }
+    
+    # print results
+    if (print_tables){
+      print(ROI)
+      print(assessment)
+      print(stat_summary)
+    }
+
+  }
+}
+
+```
+
+
+Table S9
+```{r}
+#load the data
+size_df = read_csv(glue('{data_dir}tbl_s9.csv'),show_col_types = FALSE)
+
+#set reference
+size_df$study_group <- factor(size_df$study_group,levels=c('intervention','dys_control','typ_control'))
+
+# define variables for looping
+rois=c('VWFA1','VWFA2','FFA1','FFA2')
+
+# loop through  rois
+for (ROI in rois){
+  
+  # subset the data
+  data=subset(size_df, roi==ROI)
+  
+  # define the formula
+  my_formula = as.formula(paste0('size ~ MRI_days_ses2*study_group + age + mean_fd + good_run + (1 | sub)'))
+  
+  # fit the model
+  lme_model_covs=lmer(formula = my_formula, data = data)
+  
+  # compile results
+  stat_summary = lme_model_covs%>% summary()
+  
+    # save results
+  if (save_tables) {
+    write.table(stat_summary$coefficients,glue('{tbl_dir}tbl_s9_{ROI}.txt'), 
+                row.names = TRUE, sep = "\t")
+  }
+  
+  # print results
+  if (print_tables){
+    print(ROI)
+    print(stat_summary)
+  }
+
+}
+```
+
+
+Table S14
+```{r}
+#load the data
+size_df = read_csv(glue('{data_dir}tbl_s14.csv'),show_col_types = FALSE)
+
+#set reference
+size_df$study_group <- factor(size_df$study_group,levels=c('intervention','dys_control','typ_control'))
+
+# define variables for looping
+rois=c('VWFA1','VWFA2','FFA1','FFA2')
+assessments = c('wj_lwid','wj_wa','wj_srf','twre_swe','twre_pde','wj_mff')
+
+# loop through assessments and rois
+for (assessment in assessments){
+  for (ROI in rois){
+    
+    # subset the data
+    data=subset(size_df, roi==ROI)
+    
+    # define the formula
+    my_formula = as.formula(paste0('log_size ~ ',assessment,'_raw_trait + ',assessment,'_raw_state*study_group + age + mean_fd + good_run + (1 | sub)'))
+    
+    # fit the model
+    lme_model_covs=lmer(formula = my_formula, data = data)
+    
+    # compile results
+    stat_summary = lme_model_covs%>% summary()
+    
+          # save results
+      if (save_tables) {
+        write.table(stat_summary$coefficients,glue('{tbl_dir}tbl_s14_{ROI}_{assessment}.txt'), 
+                    row.names = TRUE, sep = "\t")
+      }
+      
+      # print results
+      if (print_tables){
+        print(ROI)
+        print(assessment)
+        print(stat_summary)
+      }
+
+  }
+}
+```

@@ -1,0 +1,115 @@
+---
+title: "Text Selectivity LMEs"
+output: html_notebook
+---
+
+Set Up
+```{r}
+# import packages
+library('glue')
+library('lme4')
+library('tidyverse')
+library('lmerTest')
+```
+
+```{r}
+# flag to save and print tables
+save_tables = FALSE
+print_tables = FALSE
+
+# set directories
+setwd("..")
+base_dir = getwd()
+data_dir = glue('{base_dir}/Source_Data/')
+tbl_dir = glue('{base_dir}/tables/')
+```
+
+Table S12
+```{r}
+#load the data
+selectivity = read_csv(glue('{data_dir}tbl_s12.csv'),show_col_types = FALSE)
+
+#set reference
+selectivity$study_group <- factor(selectivity$study_group,levels=c('intervention','dys_control','typ_control'))
+
+# define variables for looping
+rois=c('VWFA1','VWFA2','FFA1','FFA2')
+
+# loop through rois
+for (ROI in rois){
+  
+  # subset the data
+  data=subset(selectivity, roi==ROI)
+  
+  # define the formula
+  my_formula = as.formula(paste0('text_selectivity ~ MRI_days_ses2*study_group + age + mean_fd + good_run + (1 | sub)'))
+  
+  # fit the model
+  lme_model_covs=lmer(formula = my_formula, data = data)
+  
+  # compile results
+  stat_summary = lme_model_covs%>% summary()
+  
+  # save results
+  if (save_tables) {
+    write.table(stat_summary$coefficients,glue('{tbl_dir}tbl_s12_{ROI}.txt'), 
+                row.names = TRUE, sep = "\t")
+  }
+  
+  # print results
+  if (print_tables){
+    print(ROI)
+    print(stat_summary)
+  }
+
+}
+
+```
+
+
+
+Table S17
+```{r}
+#load the data
+selectivity = read_csv(glue('{data_dir}tbl_s17.csv'),show_col_types = FALSE)
+
+#set reference
+selectivity$study_group <- factor(selectivity$study_group,levels=c('intervention','dys_control','typ_control'))
+
+# define variables for looping
+rois=c('VWFA1','VWFA2','FFA1','FFA2')
+assessments = c('wj_brs','wj_rf','twre_index','wj_mff_ss')
+
+# loop through assessments and rois
+for (assessment in assessments){
+  for (ROI in rois){
+    
+    # subset the data
+    data=subset(selectivity, roi==ROI)
+    
+    # define the formula
+    my_formula = as.formula(paste0('text_selectivity ~ ',assessment,'_trait + ',assessment,'_state*study_group + age + mean_fd + good_run + (1 | sub)'))
+    
+    # fit the model
+    lme_model_covs=lmer(formula = my_formula, data = data)
+    
+    # compile results
+    stat_summary= lme_model_covs%>% summary()
+    
+    # save results
+    if (save_tables) {
+      write.table(stat_summary$coefficients,glue('{tbl_dir}tbl_s17_{ROI}_{assessment}.txt'), 
+                  row.names = TRUE, sep = "\t")
+    }
+    
+    # print results
+    if (print_tables){
+      print(ROI)
+      print(assessment)
+      print(stat_summary)
+    }
+
+  }
+}
+
+```

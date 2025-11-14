@@ -1,0 +1,109 @@
+---
+title: "Assessment Scores LMEs"
+output: html_notebook
+---
+
+Set Up
+```{r}
+# import packages
+library('glue')
+library('lme4')
+library('tidyverse')
+library('lmerTest')
+```
+
+```{r}
+# flag to save and print tables
+save_tables = FALSE
+print_tables = FALSE
+
+# set directories
+setwd("..")
+base_dir = getwd()
+data_dir = glue('{base_dir}/Source_Data/')
+tbl_dir = glue('{base_dir}/tables/')
+```
+
+Table S6
+```{r}
+# load the data
+all_data = read_csv(glue('{data_dir}tbl_s6.csv'), show_col_types = FALSE)
+
+# define variables 
+assessments = c('wj_brs','wj_rf','twre_index','wj_mff_ss')
+groups = c('intervention','dys_control','typ_control')
+
+# loop through assessments and groups
+for (assessment in assessments){
+  for (group in groups){
+    
+    # subset the data
+    group_data = subset(all_data, study_group==group)
+    
+    # define the formula
+    my_formula = as.formula(paste0(assessment,' ~ MRI_days_ses2 + (1 | sub)'))
+    
+    # fit the model
+    lme_model=lmer(formula = my_formula,
+                        data = group_data)
+    
+    # compile results
+    stat_summary = lme_model%>% summary()
+    
+    # save results
+    if (save_tables) {
+      write.table(stat_summary$coefficients,glue('{tbl_dir}tbl_s6_{assessment}_{group}.txt'), 
+                  row.names = TRUE, sep = "\t")
+    }
+    
+    # print results
+    if (print_tables){
+      print(assessment)
+      print(group)
+      print(stat_summary)
+    }
+
+    
+    }
+}
+```
+
+Table S7
+```{r}
+# load the data
+all_data = read_csv(glue('{data_dir}tbl_s6.csv'), show_col_types = FALSE) # uses same data as Table S6
+
+# assign study_group to ordered factor
+all_data$study_group <- factor(all_data$study_group,levels=c('intervention','dys_control','typ_control'))
+
+
+# define variables 
+assessments = c('wj_brs','wj_rf','twre_index','wj_mff_ss')
+
+# loop through assessments 
+for (assessment in assessments){
+
+  # define the formula
+  my_formula = as.formula(paste0(assessment,' ~ MRI_days_ses2*study_group + (1 | sub)'))
+  
+  # fit the model
+  lme_model=lmer(formula = my_formula,
+                      data = all_data)
+  
+  # compile results
+  stat_summary = lme_model%>% summary()
+  
+  # save results
+  if (save_tables) {
+    write.table(stat_summary$coefficients,glue('{tbl_dir}tbl_s7_{assessment}.txt'), 
+                row.names = TRUE, sep = "\t")
+  }
+  
+  # print results
+  if (print_tables){
+    print(assessment)
+    print(stat_summary)
+  }
+
+}
+```
