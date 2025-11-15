@@ -3,7 +3,7 @@ Code associated with:
 Mitchell, J. L., Yablonski, M., Stone, H. L., Fuentes-Jimenez, M., Takada, M. E., Tang, K. A., Tran, J. E., Chou, C., & Yeatman, J. D. (2025). Small or absent Visual Word Form Area is a trait of dyslexia. bioRxiv, 2025.01.14.632854. https://doi.org/10.1101/2025.01.14.632854
 
 ## General Note
-The data associated with this manuscript and analysis can be found in a Stanford University Libraries Digital Repository at [https://doi.org/10.25740/bq006zp5312](https://doi.org/10.25740/bq006zp5312). In order for the code to run flawlessly, you should download this data and store it in a folder named `Source_Data` and then download the code and store it in a parent folder alongside `Source_Data`. `Source_Data` contains a csv file with data needed to create every table and figure of the manuscript. Each cv is named according to the display item it is used to generate. Below is a description of which display items can be generates with each notebook. 
+The data associated with this manuscript and analysis can be found in a Stanford University Libraries Digital Repository at [https://doi.org/10.25740/bq006zp5312](https://doi.org/10.25740/bq006zp5312). In order for the code to run flawlessly, you should download this data and store it in a folder named `Source_Data` and then download the code and store it in a parent folder alongside `Source_Data`. `Source_Data` contains a csv file with data needed to create every table and figure of the manuscript. Each csv is named according to the display item it is used to generate. Below is a description of which display items can be generated with each notebook. 
 
 ## Location of Manuscript Display Items Code
 ### Python Code
@@ -33,7 +33,7 @@ The data associated with this manuscript and analysis can be found in a Stanford
     - Figure 2f
     - Figure 5b
     - Table S5
-- prediction.ipynb: code pertaining to display item generation for a prediction analysis of VWFA size with theoretically sufficient intervention dossage
+- prediction.ipynb: code pertaining to display item generation for a prediction analysis of VWFA size with theoretically sufficient intervention dosage
     - Figure 6 (4 separate files to be combined into a single figure)
 - participant_data.ipynb: code pertaining to display item generation for study timeline and fMRI motion quality data
     - Figure S4
